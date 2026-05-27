@@ -1,6 +1,7 @@
 # avro-phonetic
 
-> Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout.
+> Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout. 
+> Supports all vowels, consonants, conjuncts, and special characters.
 
 [![npm version](https://img.shields.io/npm/v/avro-phonetic?style=flat-square)](https://www.npmjs.com/package/avro-phonetic)
 [![CI](https://img.shields.io/github/actions/workflow/status/subhesadek/avro-phonetic/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/subhesadek/avro-phonetic/actions)
