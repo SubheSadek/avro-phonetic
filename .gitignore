@@ -2,6 +2,7 @@
 node_modules/
 .pnp
 .pnp.js
+.pnpm-store/
 
 # Build output
 dist/
@@ -36,8 +37,7 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Package manager lock files (keep only one)
-# Uncommenting the ones you don't use:
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
+# Package manager lock files — project uses pnpm
+# Commit pnpm-lock.yaml; ignore npm/yarn equivalents
+package-lock.json
+yarn.lock

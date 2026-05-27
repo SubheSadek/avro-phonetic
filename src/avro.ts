@@ -44,8 +44,7 @@ function testCondition(
   pos: number,
   findLength: number,
 ): boolean {
-  const ch =
-    cond.type === 'prefix' ? charBefore(input, pos) : charAfter(input, pos, findLength);
+  const ch = cond.type === 'prefix' ? charBefore(input, pos) : charAfter(input, pos, findLength);
 
   let result: boolean;
 
@@ -88,9 +87,7 @@ function tryPattern(entry: PatternEntry, input: string, pos: number): string | n
   // Evaluate conditional rules (first winner takes it)
   if (rules !== undefined && rules.length > 0) {
     for (const rule of rules) {
-      const allMatch = rule.matches.every((cond) =>
-        testCondition(cond, input, pos, find.length),
-      );
+      const allMatch = rule.matches.every((cond) => testCondition(cond, input, pos, find.length));
       if (allMatch) return rule.replace;
     }
   }

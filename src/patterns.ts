@@ -272,9 +272,11 @@ export const PATTERNS: readonly PatternEntry[] = [
   // 'ng' → ং (anusvara) by default.
   // When followed by a vowel it becomes ন্গ (conjunct) so that "manga" → মান্গা.
   // At end of word or before consonant it stays ং (e.g. "bangla" → বাংলা).
-  { find: 'ng', replace: B.ANUSVAR, rules: [
-    { matches: [{ type: 'suffix', scope: 'vowel' }], replace: conj(B.NG_LETTER, B.G) },
-  ]},
+  {
+    find: 'ng',
+    replace: B.ANUSVAR,
+    rules: [{ matches: [{ type: 'suffix', scope: 'vowel' }], replace: conj(B.NG_LETTER, B.G) }],
+  },
   { find: 'nn', replace: conj(B.N, B.N), rules: [] },
   { find: 'nm', replace: conj(B.N, B.M), rules: [] },
   { find: 'nl', replace: conj(B.N, B.L), rules: [] },
@@ -371,7 +373,7 @@ export const PATTERNS: readonly PatternEntry[] = [
   { find: 'dt', replace: conj(B.D, B.T), rules: [] },
 
   // Special characters
-  { find: '^^', replace: H, rules: [] },          // explicit hasanta
+  { find: '^^', replace: H, rules: [] }, // explicit hasanta
   { find: ',,', replace: B.CHANDRABINDU, rules: [] },
 
   // ── 1-char sequences ──────────────────────────────────────────────────────
@@ -384,8 +386,8 @@ export const PATTERNS: readonly PatternEntry[] = [
 
   // Uppercase vowels → always independent form
   { find: 'A', replace: B.A, rules: [] },
-  { find: 'I', replace: B.II, rules: [] },        // capital I → ঈ
-  { find: 'U', replace: B.UU, rules: [] },         // capital U → ঊ
+  { find: 'I', replace: B.II, rules: [] }, // capital I → ঈ
+  { find: 'U', replace: B.UU, rules: [] }, // capital U → ঊ
   { find: 'E', replace: B.E, rules: [] },
   { find: 'O', replace: B.O, rules: [] },
 
@@ -409,14 +411,18 @@ export const PATTERNS: readonly PatternEntry[] = [
   { find: 'h', replace: B.H, rules: [] },
   { find: 'R', replace: B.RR, rules: [] },
   { find: 'y', replace: B.Y, rules: [] },
-  { find: 'S', replace: B.SH, rules: [] },        // S → শ (common alternative)
-  { find: 'f', replace: B.PH, rules: [] },        // f → ফ
-  { find: 'v', replace: B.BH, rules: [] },        // v → ভ
-  { find: 'q', replace: B.K, rules: [] },         // q → ক (no native Bangla)
-  { find: 'w', replace: B.O, rules: [] },         // w → ও (approximation)
-  { find: 'x', replace: conj(B.K, B.S), rules: [
-    { matches: [{ type: 'prefix', scope: 'punctuation' }], replace: `${B.E}${conj(B.K, B.S)}` },
-  ]},
+  { find: 'S', replace: B.SH, rules: [] }, // S → শ (common alternative)
+  { find: 'f', replace: B.PH, rules: [] }, // f → ফ
+  { find: 'v', replace: B.BH, rules: [] }, // v → ভ
+  { find: 'q', replace: B.K, rules: [] }, // q → ক (no native Bangla)
+  { find: 'w', replace: B.O, rules: [] }, // w → ও (approximation)
+  {
+    find: 'x',
+    replace: conj(B.K, B.S),
+    rules: [
+      { matches: [{ type: 'prefix', scope: 'punctuation' }], replace: `${B.E}${conj(B.K, B.S)}` },
+    ],
+  },
   // 'c' → স by default (e.g. "peace" → পিস). 'ch' is already handled by the
   // 2-char 'ch' pattern which fires before single 'c' due to greedy ordering.
   { find: 'c', replace: B.S, rules: [] },
@@ -438,9 +444,11 @@ export const PATTERNS: readonly PatternEntry[] = [
   { find: '9', replace: B.D9, rules: [] },
 
   // Sentence-ending full stop → Bangla daari (handled specially in parse)
-  { find: '.', replace: B.DAARI, rules: [
-    { matches: [{ type: 'suffix', scope: 'exact', value: '.' }], replace: '.' },
-  ]},
+  {
+    find: '.',
+    replace: B.DAARI,
+    rules: [{ matches: [{ type: 'suffix', scope: 'exact', value: '.' }], replace: '.' }],
+  },
 ];
 
 /** The patterns pre-sorted by `find` length descending (longest-match-first). */

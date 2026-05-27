@@ -1,0 +1,25 @@
+# Docker Compose — avro-phonetic
+# Usage:
+#   docker compose run --rm test     # run full test suite
+#   docker compose run --rm build    # produce dist/ artefacts
+#
+# The `build` service mounts dist/ back to the host so you can
+# inspect / publish the compiled output without entering the container.
+
+services:
+  # ── full test suite (typecheck + lint + format + unit tests) ──
+  test:
+    build:
+      context: .
+      target: test
+    # no ports needed — exit code drives CI pass/fail
+
+  # ── compile TypeScript and export dist/ to the host ───────────
+  build:
+    build:
+      context: .
+      target: build
+    volumes:
+      - type: bind
+        source: ./dist
+        target: /app/dist

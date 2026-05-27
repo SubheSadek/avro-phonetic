@@ -8,31 +8,52 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+
+    # Minimal permissions — read code + write OIDC token for npm provenance
     permissions:
       contents: read
-      id-token: write  # for npm provenance
+      id-token: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        # version resolved from "packageManager" in package.json
+
+      # registry-url causes setup-node to write an .npmrc that maps
+      # NODE_AUTH_TOKEN → //registry.npmjs.org/:_authToken
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24
           registry-url: https://registry.npmjs.org
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npm test
+        run: pnpm run test
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
+      # Tag in the release must match the version in package.json
+      - name: Assert tag matches package version
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          TAG="${{ github.event.release.tag_name }}"
+          if [ "$PKG_VERSION" != "$TAG" ]; then
+            echo "❌  Tag ($TAG) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "✅  Version match: $TAG"
+
+      # npm provenance attaches a signed attestation linking the package
+      # back to this exact GitHub Actions run (requires id-token: write).
       - name: Publish to npm (with provenance)
-        run: npm publish --provenance --access public
+        run: pnpm publish --provenance --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

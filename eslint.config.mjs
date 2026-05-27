@@ -9,8 +9,18 @@ export default [
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: './tsconfig.json',
-        ecmaVersion: 2020,
+        // projectService (v8+) uses TypeScript's language service for tsconfig
+        // discovery. By default it walks up from each file to find the nearest
+        // tsconfig.json — but tsconfig.json explicitly excludes tests/, so test
+        // files aren't resolved. allowDefaultProject catches those unresolved
+        // files and re-processes them with tsconfig.test.json, which does
+        // include tests/**/*.
+        projectService: {
+          allowDefaultProject: ['tests/*.ts'],
+          defaultProject: './tsconfig.test.json',
+        },
+        tsconfigRootDir: import.meta.dirname,
+        ecmaVersion: 2025,
         sourceType: 'module',
       },
     },
@@ -39,6 +49,7 @@ export default [
     },
   },
   {
+    // Relax rules that are too strict / irrelevant in test files
     files: ['tests/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

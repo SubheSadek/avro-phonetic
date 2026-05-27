@@ -1,0 +1,10 @@
+# pnpm-workspace.yaml
+# pnpm 11+ reads all package-level settings from here.
+# See: https://pnpm.io/settings
+
+# allowBuilds — map of packages permitted to run post-install build scripts.
+# esbuild downloads its platform-specific native binary via a post-install
+# script, which is required by tsup. Setting it to true explicitly approves it.
+# (pnpm 11 renamed onlyBuiltDependencies → allowBuilds)
+allowBuilds:
+  esbuild: true

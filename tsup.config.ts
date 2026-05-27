@@ -9,7 +9,7 @@ export default defineConfig({
   minify: false,
   splitting: false,
   treeshake: true,
-  target: 'es2020',
+  target: 'es2025',
   outDir: 'dist',
   banner: {
     js: '// avro-phonetic — MIT/MPL-2.0 — https://github.com/subhesadek/avro-phonetic',
