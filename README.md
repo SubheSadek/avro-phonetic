@@ -292,4 +292,4 @@ by [OmicronLab](https://www.omicronlab.com/).
 
 ## License
 
-[Mozilla Public License 2.0](./LICENSE) — © 2024 HET
+[Mozilla Public License 2.0](./LICENSE) — © 2024 Sadek

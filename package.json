@@ -24,7 +24,7 @@
     "url": "git+https://github.com/subhesadek/avro-phonetic.git"
   },
   "license": "MPL-2.0",
-  "author": "HET <subhesadek@gmail.com>",
+  "author": "Sadek <subhesadek@gmail.com>",
   "type": "module",
   "exports": {
     ".": {
