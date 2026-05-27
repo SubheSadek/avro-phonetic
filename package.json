@@ -1,6 +1,6 @@
 {
   "name": "@subhesadek/avro-phonetic",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A TypeScript/JavaScript implementation of Avro Phonetic — convert English transliteration to Bangla (Bengali) Unicode text.",
   "keywords": [
     "avro",
