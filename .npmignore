@@ -1,0 +1,20 @@
+# Source
+src/
+tests/
+
+# Config files
+tsconfig*.json
+tsup.config.ts
+vitest.config.ts
+eslint.config.mjs
+.prettierrc
+.gitignore
+.github/
+
+# Dev files
+*.test.ts
+*.spec.ts
+coverage/
+node_modules/
+*.log
+.env*
