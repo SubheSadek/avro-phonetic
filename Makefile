@@ -114,11 +114,29 @@ sync:
 	@echo "✅ Synced!"
 
 # ----------------------------------------
+# Version bumping
+# ----------------------------------------
+.PHONY: version-patch version-minor version-major
+version-patch:
+	$(PNPM) version patch
+
+version-minor:
+	$(PNPM) version minor
+
+version-major:
+	$(PNPM) version major
+
+# ----------------------------------------
 # Helpers
 # ----------------------------------------
 .PHONY: pnpm
 pnpm:
 	$(PNPM) $(filter-out $@,$(MAKECMDGOALS))
+
+# Catch-all: silently ignore extra words passed to passthrough targets
+# (e.g. "make pnpm version patch" — 'version' and 'patch' become no-ops)
+%:
+	@:
 
 .PHONY: help
 help:
@@ -145,6 +163,11 @@ help:
 	@echo "    fmt          Prettier write"
 	@echo "    fmt-check    Prettier check"
 	@echo "    typecheck    tsc --noEmit"
+	@echo ""
+	@echo "  Version"
+	@echo "    version-patch  Bump patch version (1.0.0 → 1.0.1)"
+	@echo "    version-minor  Bump minor version (1.0.0 → 1.1.0)"
+	@echo "    version-major  Bump major version (1.0.0 → 2.0.0)"
 	@echo ""
 	@echo "  Composite"
 	@echo "    check        typecheck + lint + fmt-check + test"
