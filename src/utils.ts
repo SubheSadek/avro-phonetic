@@ -44,6 +44,6 @@ export function isPunctuation(ch: string): boolean {
  */
 export function assertString(value: unknown): asserts value is string {
   if (typeof value !== 'string') {
-    throw new TypeError(`avro-phonetic: expected a string, got ${typeof value}`);
+    throw new TypeError(`@subhesadek/avro-phonetic: expected a string, got ${typeof value}`);
   }
 }

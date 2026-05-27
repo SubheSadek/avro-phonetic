@@ -107,7 +107,7 @@ function tryPattern(entry: PatternEntry, input: string, pos: number): string | n
  *
  * @example
  * ```ts
- * import { parse } from 'avro-phonetic';
+ * import { parse } from '@subhesadek/avro-phonetic';
  *
  * const result = parse('ami banglay gan gai');
  * console.log(result.bangla); // আমি বাংলায় গান গাই
@@ -173,7 +173,7 @@ export function parse(input: string, options: ParseOptions = {}): ParseResult {
  *
  * @example
  * ```ts
- * import { toBangla } from 'avro-phonetic';
+ * import { toBangla } from '@subhesadek/avro-phonetic';
  *
  * console.log(toBangla('khub bhalo')); // খুব ভালো
  * ```

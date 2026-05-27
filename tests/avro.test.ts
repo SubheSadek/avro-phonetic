@@ -1,5 +1,5 @@
 /**
- * avro-phonetic — unit & integration tests
+ * @subhesadek/avro-phonetic — unit & integration tests
  *
  * Test cases are derived from the Avro Phonetic specification and the
  * jsAvroPhonetic reference implementation.

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **avro-phonetic** will be documented in this file.
+All notable changes to **@subhesadek/avro-phonetic** will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of `avro-phonetic`.
+- Initial release of `@subhesadek/avro-phonetic`.
 - Full TypeScript implementation of the Avro Phonetic keyboard layout.
 - `parse(input, options?)` — returns `{ bangla, english }` result object.
 - `toBangla(input, options?)` — convenience helper returning the Bangla string directly.

@@ -1,12 +1,12 @@
-# avro-phonetic
+# @subhesadek/avro-phonetic
 
 > Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout. 
 > Supports all vowels, consonants, conjuncts, and special characters.
 
-[![npm version](https://img.shields.io/npm/v/avro-phonetic?style=flat-square)](https://www.npmjs.com/package/avro-phonetic)
+[![npm version](https://img.shields.io/npm/v/%40subhesadek%2Favro-phonetic?style=flat-square)](https://www.npmjs.com/package/@subhesadek/avro-phonetic)
 [![CI](https://img.shields.io/github/actions/workflow/status/subhesadek/avro-phonetic/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/subhesadek/avro-phonetic/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/subhesadek/avro-phonetic?style=flat-square)](https://codecov.io/gh/subhesadek/avro-phonetic)
-[![License](https://img.shields.io/npm/l/avro-phonetic?style=flat-square)](./LICENSE)
+[![License](https://img.shields.io/npm/l/%40subhesadek%2Favro-phonetic?style=flat-square)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 
 ---
@@ -25,11 +25,11 @@
 ## Installation
 
 ```bash
-npm install avro-phonetic
+npm install @subhesadek/avro-phonetic
 # or
-yarn add avro-phonetic
+yarn add @subhesadek/avro-phonetic
 # or
-pnpm add avro-phonetic
+pnpm add @subhesadek/avro-phonetic
 ```
 
 ---
@@ -37,7 +37,7 @@ pnpm add avro-phonetic
 ## Quick Start
 
 ```ts
-import { parse, toBangla, isBangla } from 'avro-phonetic';
+import { parse, toBangla, isBangla } from '@subhesadek/avro-phonetic';
 
 // Full result object
 const result = parse('ami banglay gan gai');
@@ -56,7 +56,7 @@ console.log(isBangla('ami'));  // false
 ### CommonJS
 
 ```js
-const { toBangla } = require('avro-phonetic');
+const { toBangla } = require('@subhesadek/avro-phonetic');
 console.log(toBangla('ami'));
 ```
 
@@ -194,8 +194,8 @@ The `PATTERNS` and `SORTED_PATTERNS` arrays are exported for advanced use cases
 (e.g. building a custom IME or extending the ruleset):
 
 ```ts
-import { SORTED_PATTERNS } from 'avro-phonetic';
-import type { PatternEntry } from 'avro-phonetic';
+import { SORTED_PATTERNS } from '@subhesadek/avro-phonetic';
+import type { PatternEntry } from '@subhesadek/avro-phonetic';
 
 const custom: PatternEntry[] = [
   ...SORTED_PATTERNS,
@@ -208,7 +208,7 @@ const custom: PatternEntry[] = [
 ## Examples
 
 ```ts
-import { toBangla } from 'avro-phonetic';
+import { toBangla } from '@subhesadek/avro-phonetic';
 
 // Common greetings
 toBangla('assalamu alaikum');   // আস্সালামু আলাইকুম

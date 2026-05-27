@@ -12,6 +12,6 @@ export default defineConfig({
   target: 'es2025',
   outDir: 'dist',
   banner: {
-    js: '// avro-phonetic — MIT/MPL-2.0 — https://github.com/subhesadek/avro-phonetic',
+    js: '// @subhesadek/avro-phonetic — MPL-2.0 — https://github.com/subhesadek/avro-phonetic',
   },
 });

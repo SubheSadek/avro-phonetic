@@ -8,7 +8,7 @@
  *
  * @example Basic usage
  * ```ts
- * import { parse, toBangla, isBangla } from 'avro-phonetic';
+ * import { parse, toBangla, isBangla } from '@subhesadek/avro-phonetic';
  *
  * // Full result object
  * const result = parse('ami banglay gan gai');
@@ -25,7 +25,7 @@
  *
  * @example With options
  * ```ts
- * import { toBangla } from 'avro-phonetic';
+ * import { toBangla } from '@subhesadek/avro-phonetic';
  *
  * // Keep ASCII digits instead of Bangla digits
  * toBangla('amar 3ti boi', { banglaDigits: false });

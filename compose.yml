@@ -1,4 +1,4 @@
-# Docker Compose — avro-phonetic
+# Docker Compose — @subhesadek/avro-phonetic
 # Usage:
 #   docker compose run --rm test     # run full test suite
 #   docker compose run --rm build    # produce dist/ artefacts
