@@ -247,6 +247,27 @@ describe('ParseOptions', () => {
   });
 });
 
+// ── 'x' pattern — scope: 'punctuation' condition ─────────────────────────────
+// The 'x' pattern is the only one with a `scope: 'punctuation'` rule condition.
+// These two cases together cover:
+//   • avro.ts  — the `case 'punctuation':` branch in testCondition()
+//   • utils.ts — the short-circuit branch of `!isVowel(ch) && !isConsonant(ch)`
+//                when ch IS a vowel (isPunctuation returns false early)
+
+describe("'x' pattern (punctuation-scope condition)", () => {
+  it('x at start of word → এক্স (punctuation prefix rule fires)', () => {
+    // charBefore is "" (start-of-string sentinel), isPunctuation("") === true
+    // → the prefix-punctuation rule fires → replace = এ + ক্স
+    expect(bn('x')).toBe(nfc('এক্স'));
+  });
+
+  it('x after a vowel → ক্স only (punctuation prefix rule does NOT fire)', () => {
+    // charBefore is 'a' (a vowel), isPunctuation('a') === false (short-circuit)
+    // → rule condition fails → falls through to default replace = ক্স
+    expect(bn('ax')).toBe(nfc('আক্স'));
+  });
+});
+
 // ── Uppercase / alternative inputs ───────────────────────────────────────────
 
 describe('Uppercase and alternative consonant inputs', () => {

@@ -63,6 +63,7 @@ function testCondition(
       break;
     default: {
       // Exhaustiveness guard — TypeScript ensures this branch is unreachable
+      /* v8 ignore next 3 */
       const _exhaustive: never = cond.scope;
       result = false;
       void _exhaustive;

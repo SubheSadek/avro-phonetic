@@ -93,7 +93,7 @@ typecheck:
 # Composite commands
 # ----------------------------------------
 .PHONY: check
-check: typecheck lint fmt-check test
+check: typecheck lint fmt-check test-cov
 
 .PHONY: release
 release: clean compile
@@ -116,14 +116,14 @@ sync:
 # ----------------------------------------
 # Version bumping
 # ----------------------------------------
-.PHONY: version-patch version-minor version-major
-version-patch:
+.PHONY: v-patch
+v-patch:
 	$(PNPM) version patch
 
-version-minor:
+v-minor:
 	$(PNPM) version minor
 
-version-major:
+v-major:
 	$(PNPM) version major
 
 # ----------------------------------------
@@ -170,7 +170,7 @@ help:
 	@echo "    version-major  Bump major version (1.0.0 → 2.0.0)"
 	@echo ""
 	@echo "  Composite"
-	@echo "    check        typecheck + lint + fmt-check + test"
+	@echo "    check        typecheck + lint + fmt-check + test (with coverage)"
 	@echo "    release      clean + compile"
 	@echo "    publish      check + release + pnpm publish"
 	@echo "    sync         Copy node_modules from container to host"

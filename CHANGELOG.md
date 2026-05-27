@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.3] — 2026-05-27
+
+### Fixed
+
+- Fixed branch coverage threshold by adding tests for the `x` pattern.
+- Added `/* v8 ignore */` on unreachable TypeScript exhaustiveness guard.
+
+### Changed
+- `make check` now includes coverage report (`test-cov` instead of `test`).
+
+---
+
 ## [1.0.0] — 2024-01-01
 
 ### Added
@@ -28,4 +40,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[1.0.3]: https://github.com/subhesadek/avro-phonetic/releases/tag/v1.0.3
 [1.0.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v1.0.0
