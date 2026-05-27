@@ -15,13 +15,13 @@
     "i18n",
     "l10n"
   ],
-  "homepage": "https://github.com/subhesadek/avro-phonetic#readme",
+  "homepage": "https://github.com/SubheSadek/avro-phonetic#readme",
   "bugs": {
-    "url": "https://github.com/subhesadek/avro-phonetic/issues"
+    "url": "https://github.com/SubheSadek/avro-phonetic/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/subhesadek/avro-phonetic.git"
+    "url": "git+https://github.com/SubheSadek/avro-phonetic.git"
   },
   "license": "MPL-2.0",
   "author": "Sadek <subhesadek@gmail.com>",
