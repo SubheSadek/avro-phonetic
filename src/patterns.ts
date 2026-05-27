@@ -143,6 +143,7 @@ function vowelEntry(find: string, independent: string, dependent: string): Patte
 
 export const PATTERNS: readonly PatternEntry[] = [
   // ── 4-char sequences ──────────────────────────────────────────────────────
+  // kSh + vowel combos
   { find: 'kkha', replace: conj(B.K, B.KH) + B.AA_KAR, rules: [] },
   { find: 'kSha', replace: B.KSH + B.AA_KAR, rules: [] },
   { find: 'kShi', replace: B.KSH + B.I_KAR, rules: [] },
@@ -151,6 +152,22 @@ export const PATTERNS: readonly PatternEntry[] = [
   { find: 'kSho', replace: B.KSH + B.O_KAR, rules: [] },
   { find: 'rrai', replace: B.RRI, rules: [] },
   { find: 'rrhi', replace: B.RRI, rules: [] },
+
+  // [consonant]rri → consonant + ৃ (rri-kaar / vocalic-R sign)
+  // These MUST come before the 2-char kr/gr/pr/etc. cluster patterns so that
+  // "krri" is consumed as a 4-char unit (কৃ) rather than "kr"(ক্র) + "ri"(রি).
+  { find: 'krri', replace: B.K + B.RRI_KAR, rules: [] },
+  { find: 'grri', replace: B.G + B.RRI_KAR, rules: [] },
+  { find: 'trri', replace: B.T + B.RRI_KAR, rules: [] },
+  { find: 'drri', replace: B.D + B.RRI_KAR, rules: [] },
+  { find: 'nrri', replace: B.N + B.RRI_KAR, rules: [] },
+  { find: 'prri', replace: B.P + B.RRI_KAR, rules: [] },
+  { find: 'brri', replace: B.B + B.RRI_KAR, rules: [] },
+  { find: 'mrri', replace: B.M + B.RRI_KAR, rules: [] },
+  { find: 'hrri', replace: B.H + B.RRI_KAR, rules: [] },
+  { find: 'lrri', replace: B.L + B.RRI_KAR, rules: [] },
+  { find: 'zrri', replace: B.Z + B.RRI_KAR, rules: [] },
+  { find: 'srri', replace: B.S + B.RRI_KAR, rules: [] },
 
   // ── 3-char sequences ──────────────────────────────────────────────────────
   // Vowels

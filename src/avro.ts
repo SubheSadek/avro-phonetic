@@ -161,7 +161,9 @@ export function parse(input: string, options: ParseOptions = {}): ParseResult {
     bangla = bangla.replace(/।/gu, '.');
   }
 
-  return { bangla, english: input };
+  // Normalise to NFC so that multi-codepoint characters like ড় (ড+়),
+  // ঢ় (ঢ+়), য় (য+়) are always returned in their precomposed form.
+  return { bangla: bangla.normalize('NFC'), english: input };
 }
 
 /**
