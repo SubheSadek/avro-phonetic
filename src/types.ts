@@ -64,6 +64,21 @@ export interface PatternEntry {
 }
 
 /**
+ * A word-level dictionary mapping lowercase Banglish (English transliteration)
+ * to canonical Bangla spellings.
+ *
+ * Used by {@link parse} to override the phonetic engine for known words.
+ * Keys are matched case-insensitively against runs of Latin letters in the
+ * input; the parser lowercases each token before lookup, so dictionary keys
+ * **must** be stored in lowercase.
+ *
+ * Values are emitted verbatim into the Bangla output, so they should already
+ * be in canonical NFC form (Unicode-normalised) and contain only Bangla
+ * Unicode characters — there is no escaping or further transformation.
+ */
+export type BanglishDictionary = Readonly<Record<string, string>>;
+
+/**
  * Options for the {@link parse} function.
  */
 export interface ParseOptions {
@@ -80,6 +95,21 @@ export interface ParseOptions {
    * @default true
    */
   banglaFullStop?: boolean;
+
+  /**
+   * Word-level overrides applied **before** the phonetic engine.
+   *
+   * - `true` (default) — use the bundled {@link BANGLISH_DICTIONARY} of common
+   *   Banglish words (e.g. `hobe → হবে`, `ami → আমি`).
+   * - `false` — disable the dictionary entirely; every token is converted
+   *   character-by-character by the phonetic engine.
+   * - A {@link BanglishDictionary} object — use the provided mapping instead
+   *   of the bundled default. Use the spread operator to extend the default:
+   *   `{ ...BANGLISH_DICTIONARY, myword: 'মাইওয়ার্ড' }`.
+   *
+   * @default true
+   */
+  dictionary?: boolean | BanglishDictionary;
 }
 
 /**

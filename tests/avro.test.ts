@@ -68,7 +68,24 @@ describe('Vowels — dependent/matra form (after consonant)', () => {
   it('ki → কি', () => expect(bn('ki')).toBe('কি'));
   it('ku → কু', () => expect(bn('ku')).toBe('কু'));
   it('ke → কে', () => expect(bn('ke')).toBe('কে')); // ক + ে (e-kaar U+09C7)
-  it('ko → কো', () => expect(bn('ko')).toBe('কো'));
+
+  // Smart-O: `o` after a consonant is the inherent অ (silent), matching how
+  // people actually type Banglish. ZWNJ is emitted internally to prevent
+  // auto-hasanta from joining the surrounding consonants, then stripped.
+  it('ko → ক (smart-O at word end)', () => expect(bn('ko')).toBe('ক'));
+  it('bo → ব (smart-O at word end)', () => expect(bn('bo')).toBe('ব'));
+  it('mo → ম (smart-O at word end)', () => expect(bn('mo')).toBe('ম'));
+  it('jo → জ (smart-O at word end)', () => expect(bn('jo')).toBe('জ'));
+  it('ko ami → ক আমি (smart-O fires before whitespace)', () =>
+    expect(bn('ko ami')).toBe(nfc('ক আমি')));
+  it('kob → কব (smart-O mid-word, no auto-hasanta between ক and ব)', () =>
+    expect(bn('kob')).toBe(nfc('কব')));
+  it('bosen → বসেন (mid-word smart-O preserves syllable break)', () =>
+    expect(bn('bosen')).toBe(nfc('বসেন')));
+  it('kor → কর (smart-O mid-word)', () => expect(bn('kor')).toBe(nfc('কর')));
+  it('bostro → বস্ত্র (smart-O does not block the str cluster)', () =>
+    expect(bn('bostro')).toBe(nfc('বস্ত্র')));
+
   it('kii → কী', () => expect(bn('kii')).toBe('কী'));
   it('kuu → কূ', () => expect(bn('kuu')).toBe('কূ'));
   it('koi → কৈ', () => expect(bn('koi')).toBe('কৈ'));
@@ -126,7 +143,7 @@ describe('Single consonants', () => {
 
 // ── Consonant conjuncts ───────────────────────────────────────────────────────
 
-describe('Conjunct consonants', () => {
+describe('Conjunct consonants — explicit cluster patterns', () => {
   it('kta → ক্তা', () => expect(bn('kta')).toBe('ক্তা'));
   it('kSh → ক্ষ', () => expect(bn('kSh')).toBe('ক্ষ'));
   it('bhl → ভ্ল', () => expect(bn('bhl')).toBe('ভ্ল'));
@@ -139,6 +156,52 @@ describe('Conjunct consonants', () => {
   it('phr → ফ্র', () => expect(bn('phr')).toBe('ফ্র'));
   it('thr → থ্র', () => expect(bn('thr')).toBe('থ্র'));
   it('dhr → ধ্র', () => expect(bn('dhr')).toBe('ধ্র'));
+});
+
+// ── Auto-hasanta (implicit conjunct formation) ────────────────────────────────
+// When two consecutive consonants appear without an intervening vowel and there
+// is no explicit cluster pattern for that pair, the parser inserts ্ (hasanta)
+// automatically — matching the behaviour of the real Avro Phonetic keyboard.
+
+describe('Auto-hasanta — implicit conjunct formation', () => {
+  // Uppercase retroflex consonants + ra (no explicit 'Tr'/'Dr'/'Nr' patterns)
+  it('Tr → ট্র', () => expect(bn('Tr')).toBe(nfc('ট্র')));
+  it('Dr → ড্র', () => expect(bn('Dr')).toBe(nfc('ড্র')));
+  it('Nr → ণ্র', () => expect(bn('Nr')).toBe(nfc('ণ্র')));
+
+  // Uppercase + la
+  it('Tl → ট্ল', () => expect(bn('Tl')).toBe(nfc('ট্ল')));
+  it('Dl → ড্ল', () => expect(bn('Dl')).toBe(nfc('ড্ল')));
+
+  // h-clusters (হ + consonant)
+  it('hr → হ্র', () => expect(bn('hr')).toBe(nfc('হ্র')));
+  it('hl → হ্ল', () => expect(bn('hl')).toBe(nfc('হ্ল')));
+  it('hm → হ্ম', () => expect(bn('hm')).toBe(nfc('হ্ম')));
+  it('hn → হ্ন', () => expect(bn('hn')).toBe(nfc('হ্ন')));
+
+  // Multi-consonant chain: auto-hasanta fires for each consecutive consonant
+  it('bkr → ব্ক্র (three-consonant conjunct)', () => expect(bn('bkr')).toBe(nfc('ব্ক্র')));
+  it('bkra → ব্ক্রা', () => expect(bn('bkra')).toBe(nfc('ব্ক্রা')));
+
+  // Explicit cluster patterns are unaffected — no double hasanta
+  it('kr → ক্র (explicit pattern, no double hasanta)', () => expect(bn('kr')).toBe(nfc('ক্র')));
+  it('kra → ক্রা', () => expect(bn('kra')).toBe(nfc('ক্রা')));
+
+  // Smart-O breaks the would-be conjunct (no ো-kaar emitted, but no
+  // hasanta either — the ZWNJ marker keeps ক/জ separate from the next
+  // consonant). Dictionary disabled to test the pure engine.
+  it('jor → জর (phonetic engine: smart-O, no conjunct)', () =>
+    expect(toBangla('jor', { dictionary: false }).normalize('NFC')).toBe(nfc('জর')));
+  // `tora` (lowercase) lives in the default dictionary as তোরা (2nd person
+  // informal plural), and dictionary lookup is case-insensitive — so the
+  // uppercase `T` doesn't escape it. Disable the dictionary to test the
+  // pure phonetic engine here.
+  it('Tora → টরা (T + implicit-অ + r + a-kaar, no conjunct)', () =>
+    expect(toBangla('Tora', { dictionary: false }).normalize('NFC')).toBe(nfc('টরা')));
+
+  // Conjunct followed by vowel
+  it('Tra → ট্রা', () => expect(bn('Tra')).toBe(nfc('ট্রা')));
+  it('Dra → ড্রা', () => expect(bn('Dra')).toBe(nfc('ড্রা')));
 });
 
 // ── Special mappings ─────────────────────────────────────────────────────────
@@ -181,15 +244,23 @@ describe('Full sentence conversion', () => {
   });
 
   it('apni ki khaichen?', () => {
-    // In phonetic mode, consecutive consonants form a conjunct automatically:
-    //   pn → প্ন  (so "apni" → আপ্নি, not আপনি)
+    // With the default Banglish dictionary in place, "apni" → আপনি (the
+    // canonical word for "you" formal) — the dictionary is the correction
+    // layer the README/CHANGELOG referenced as future work.
+    //
+    // "khaichen" is NOT in the dictionary, so the phonetic engine still runs
     //   ch → চ    (to get ছ the user must type "Ch" or "chh")
-    // This is correct algorithmic behaviour; word-level correction needs a
-    // dictionary layer on top of the raw converter.
+    // — that's still correct algorithmic behaviour for unknown words.
     const result = bn('apni ki khaichen?');
-    expect(result).toContain(nfc('আপ্নি'));
+    expect(result).toContain(nfc('আপনি'));
     expect(result).toContain(nfc('কি'));
     expect(result).toContain('?');
+  });
+
+  it('apni ki khaichen? — with dictionary disabled falls back to phonetic conjuncts', () => {
+    // Sanity check: when the dictionary is off, "apni" → আপ্নি (pn→প্ন).
+    const result = toBangla('apni ki khaichen?', { dictionary: false }).normalize('NFC');
+    expect(result).toContain(nfc('আপ্নি'));
   });
 
   it('handles whitespace correctly', () => {

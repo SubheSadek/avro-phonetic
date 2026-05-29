@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avro Phonetic Playground</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f13;
+      color: #e2e2e2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    header h1 span {
+      color: #7c6af7;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: #18181f;
+      border: 1px solid #2a2a38;
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .panes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 560px) {
+      .panes { grid-template-columns: 1fr; }
+    }
+
+    .pane label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    textarea, .output {
+      width: 100%;
+      min-height: 140px;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    textarea {
+      background: #0f0f13;
+      border: 1px solid #2a2a38;
+      color: #e2e2e2;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: #7c6af7; }
+
+    textarea::placeholder { color: #444; }
+
+    .output {
+      background: #0f0f13;
+      border: 1px solid #2a2a38;
+      color: #c4b5fd;
+      font-size: 1.35rem;
+      font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
+      overflow-y: auto;
+      word-break: break-word;
+      white-space: pre-wrap;
+      min-height: 140px;
+    }
+
+    .output.empty { color: #333; font-size: 1rem; font-family: inherit; }
+
+    .options {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #2a2a38;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #aaa;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .options input[type="checkbox"] {
+      accent-color: #7c6af7;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .examples-card {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .examples-card h2 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: #18181f;
+      border: 1px solid #2a2a38;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      color: #aaa;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .chip:hover { border-color: #7c6af7; color: #c4b5fd; }
+
+    .status {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #444;
+      text-align: right;
+    }
+
+    .status.error { color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Avro <span>Phonetic</span> Playground</h1>
+    <p>Type English transliteration → get Bangla Unicode in real-time</p>
+  </header>
+
+  <div class="card">
+    <div class="panes">
+      <div class="pane">
+        <label>English (Avro Phonetic)</label>
+        <textarea id="input" placeholder="amar sonar bangla…" autofocus spellcheck="false"></textarea>
+      </div>
+      <div class="pane">
+        <label>Bangla Output</label>
+        <div class="output empty" id="output">output will appear here…</div>
+      </div>
+    </div>
+
+    <div class="options">
+      <label>
+        <input type="checkbox" id="banglaDigits" checked />
+        Bangla digits (০–৯)
+      </label>
+      <label>
+        <input type="checkbox" id="banglaFullStop" checked />
+        Bangla full stop (।)
+      </label>
+      <label title="Use the bundled Banglish word dictionary (hobe → হবে, ami → আমি, ...)">
+        <input type="checkbox" id="useDictionary" checked />
+        Word dictionary
+      </label>
+    </div>
+
+    <div class="status" id="status">ready</div>
+  </div>
+
+  <div class="examples-card">
+    <h2>Try an example</h2>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <script type="module">
+    // Import from the LOCAL build so this playground always reflects the
+    // current source. Run `pnpm build` before opening this file and serve it
+    // through a tiny http server (see README) — `file://` cannot load ESM.
+    //
+    // If you'd rather pin to the last published release, swap the import for:
+    //   import { toBangla } from 'https://esm.sh/@subhesadek/avro-phonetic@1.0.5';
+    import { toBangla } from './dist/index.js';
+
+    const examples = [
+      // ── New: dictionary-backed canonical spellings ────────────────────────
+      'hobe',                 // হবে   (without the dictionary: হোবে)
+      'ami hobe',             // আমি হবে
+      'tumi kemon acho',      // তুমি কেমন আছো
+      'apni ki korben',       // আপনি কি করবেন
+      'dhonnobad bondhu',     // ধন্যবাদ বন্ধু
+      // ── Classic phonetic-engine examples ──────────────────────────────────
+      'amar sonar bangla',
+      'ami banglay gan gai',
+      'khub bhalo',
+      'Dhaka Bangladesh',
+      'shuvo noboborsho',
+    ];
+
+    const inputEl   = document.getElementById('input');
+    const outputEl  = document.getElementById('output');
+    const statusEl  = document.getElementById('status');
+    const digitsEl  = document.getElementById('banglaDigits');
+    const stopEl    = document.getElementById('banglaFullStop');
+    const dictEl    = document.getElementById('useDictionary');
+    const chipsEl   = document.getElementById('chips');
+
+    function convert() {
+      const text = inputEl.value;
+      if (!text.trim()) {
+        outputEl.textContent = 'output will appear here…';
+        outputEl.classList.add('empty');
+        statusEl.textContent = 'ready';
+        statusEl.className = 'status';
+        return;
+      }
+      try {
+        const result = toBangla(text, {
+          banglaDigits:   digitsEl.checked,
+          banglaFullStop: stopEl.checked,
+          dictionary:     dictEl.checked,
+        });
+        outputEl.textContent = result;
+        outputEl.classList.remove('empty');
+        statusEl.textContent =
+          `${text.length} chars → ${result.length} chars` +
+          (dictEl.checked ? '' : '  ·  dictionary off');
+        statusEl.className = 'status';
+      } catch (err) {
+        statusEl.textContent = err.message;
+        statusEl.className = 'status error';
+      }
+    }
+
+    inputEl.addEventListener('input', convert);
+    digitsEl.addEventListener('change', convert);
+    stopEl.addEventListener('change', convert);
+    dictEl.addEventListener('change', convert);
+
+    // Build example chips
+    for (const ex of examples) {
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.textContent = ex;
+      chip.addEventListener('click', () => {
+        inputEl.value = ex;
+        convert();
+        inputEl.focus();
+      });
+      chipsEl.appendChild(chip);
+    }
+  </script>
+
+</body>
+</html>

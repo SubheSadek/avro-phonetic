@@ -44,11 +44,11 @@ const B = {
   U_KAR: 'ু', // ু  U+09C1
   UU_KAR: 'ূ', // ূ  U+09C2
   RRI_KAR: 'ৃ', // ৃ  U+09C3
-  E_KAR: 'ে', // ে  U+09CB — e-kaar (used after consonant for /e/ sound)
-  OI_KAR: 'ৈ', // ৈ  U+09C8
-  O_KAR: 'ো', // ো  U+09CB — o-kaar (= ে + া)
-  OU_KAR: 'ৌ', // ৌ  U+09CC
-  E_MATRA: 'ে', // ে  U+09CB — alias for E_KAR
+  E_KAR: 'ে', // ে  U+09C7 — e-kaar (used after consonant for /e/ sound)
+  OI_KAR: 'ৈ', // ৈ  U+09C8 — oi-kaar
+  O_KAR: 'ো', // ো  U+09CB — o-kaar (= ে U+09C7 + া U+09BE)
+  OU_KAR: 'ৌ', // ৌ  U+09CC — ou-kaar
+  E_MATRA: 'ে', // ে  U+09C7 — alias for E_KAR (used by kSh* patterns)
 
   // Consonants
   K: 'ক', // ক
@@ -111,6 +111,15 @@ const B = {
 
 // Shorthand helpers
 const H = B.HASANTA; // ্
+
+/**
+ * Zero-Width Non-Joiner (U+200C). The phonetic engine emits this as a
+ * marker for the "implicit অ" — the inherent vowel that every Bangla
+ * consonant carries silently. ZWNJ is invisible, is not in the Bangla
+ * consonant Unicode block (so the auto-hasanta logic correctly treats it
+ * as a syllable break), and is stripped in `parse()` before NFC.
+ */
+export const IMPLICIT_A_MARKER = '‌';
 
 /** Builds a consonant cluster string: left + hasanta + right */
 function conj(left: string, right: string): string {
@@ -270,8 +279,8 @@ export const PATTERNS: readonly PatternEntry[] = [
   { find: 'jb', replace: conj(B.J, B.B), rules: [] },
   { find: 'nk', replace: conj(B.N, B.K), rules: [] },
   // 'ng' → ং (anusvara) by default.
-  // When followed by a vowel it becomes ন্গ (conjunct) so that "manga" → মান্গা.
-  // At end of word or before consonant it stays ং (e.g. "bangla" → বাংলা).
+  // When followed by a vowel it becomes ঙ্গ (ঙ + ্ + গ) so that "anga" → অঙ্গা.
+  // At end of word or before a consonant it stays ং (e.g. "bangla" → বাংলা).
   {
     find: 'ng',
     replace: B.ANUSVAR,
@@ -382,7 +391,31 @@ export const PATTERNS: readonly PatternEntry[] = [
   vowelEntry('i', B.I, B.I_KAR),
   vowelEntry('u', B.U, B.U_KAR),
   vowelEntry('e', B.E, B.E_KAR), // ে (e-kaar)
-  vowelEntry('o', B.O, B.O_KAR),
+
+  // 'o' is the most ambiguous Banglish letter — it can mean either the
+  // explicit ো-kaar or the inherent অ that every Bangla consonant carries
+  // silently. Strict Avro Phonetic always emits ো-kaar after a consonant; we
+  // deliberately deviate to match how people actually type Banglish:
+  //
+  //   1. After a consonant → emit ZWNJ (U+200C) as an "implicit অ" marker.
+  //      ZWNJ is invisible, isn't a Bangla consonant (so auto-hasanta does
+  //      NOT fire across it), and is stripped in `parse()` before NFC.
+  //      e.g.  `bo` → ব,  `bosen` → বসেন,  `kor` → কর,  `mon` → মন.
+  //
+  //      Words that legitimately have ো-kaar (বোন, তো, দেখো, বারো …) live
+  //      in the dictionary and bypass the engine entirely.
+  //
+  //   2. Otherwise (start of word, after vowel/punct) → independent ও.
+  {
+    find: 'o',
+    replace: B.O,
+    rules: [
+      {
+        matches: [{ type: 'prefix', scope: 'consonant' }],
+        replace: IMPLICIT_A_MARKER,
+      },
+    ],
+  },
 
   // Uppercase vowels → always independent form
   { find: 'A', replace: B.A, rules: [] },

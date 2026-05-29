@@ -38,8 +38,10 @@
  */
 
 export { isBangla, parse, toBangla } from './avro.js';
+export { BANGLISH_DICTIONARY } from './dictionary.js';
 export { PATTERNS, SORTED_PATTERNS } from './patterns.js';
 export type {
+  BanglishDictionary,
   MatchCondition,
   MatchType,
   ParseOptions,
