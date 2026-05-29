@@ -1,7 +1,9 @@
 # @subhesadek/avro-phonetic
 
-> Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout. 
-> Supports all vowels, consonants, conjuncts, and special characters.
+> Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout.
+> Supports all vowels, consonants, conjuncts, special characters — and ships
+> with a built-in ~250-word dictionary plus a "smart-O" engine rule so common
+> Banglish words like `bosen` → বসেন, `mon` → মন, `kor` → কর just work.
 
 [![npm version](https://img.shields.io/npm/v/%40subhesadek%2Favro-phonetic?style=flat-square)](https://www.npmjs.com/package/@subhesadek/avro-phonetic)
 [![CI](https://img.shields.io/github/actions/workflow/status/subhesadek/avro-phonetic/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/subhesadek/avro-phonetic/actions)
@@ -14,10 +16,12 @@
 ## Features
 
 - **Full Avro Phonetic support** — all vowels, consonants, conjuncts, and special characters
+- **Smart-O for real-world Banglish** — `o` after a consonant is treated as the inherent অ that Bangla never writes (so `bosen` → বসেন, `kor` → কর, `hobe` → হবে) — see [Smart-O & the Dictionary](#smart-o--the-dictionary) below
+- **Built-in word dictionary** — ~250 canonical spellings for high-frequency words (pronouns, verb conjugations, family terms, numbers, …) with the ability to extend or replace
 - **TypeScript-first** — written in TypeScript with strict types and bundled `.d.ts` declarations
 - **Dual package** — ships both ESM (`import`) and CommonJS (`require`) builds
 - **Zero dependencies** — tiny, self-contained, tree-shakeable
-- **Configurable** — toggle Bangla digit / full-stop conversion
+- **Configurable** — toggle Bangla digit / full-stop conversion, swap or disable the dictionary
 - **Well-tested** — comprehensive Vitest test suite
 
 ---
@@ -76,10 +80,16 @@ console.log(toBangla('ami'));
 | `rri` | ঋ / ৃ | Ri |
 | `e` | এ / ে | E |
 | `oi` / `OI` | ঐ / ৈ | Oi |
-| `o` | ও / ো | O |
+| `o` | ও / *(silent অ)* | O — see note below |
 | `ou` / `OU` | ঔ / ৌ | Ou |
 
 > Vowels produce the independent form (আ, ই…) when they appear at the start of a word, after another vowel, or after punctuation. After a consonant they produce the dependent matra form (া, ি…).
+>
+> **`o` is the exception.** After a consonant it represents the *inherent অ*
+> that every Bangla consonant carries silently (e.g. `mon` → মন, `bosen` →
+> বসেন, `kor` → কর). Words that genuinely carry ো-kaar — বোন, তো, দেখো,
+> বারো, সোনার, ফোন — live in the bundled dictionary and override the
+> engine. See [Smart-O & the Dictionary](#smart-o--the-dictionary).
 
 ### Consonants
 
@@ -183,7 +193,21 @@ interface ParseOptions {
    * @default true
    */
   banglaFullStop?: boolean;
+
+  /**
+   * Word-level overrides applied BEFORE the phonetic engine.
+   *
+   *  - `true`  (default) — use the bundled `BANGLISH_DICTIONARY`
+   *  - `false`           — disable the dictionary; pure phonetic conversion
+   *  - object            — use the provided mapping instead of the default;
+   *                        spread `BANGLISH_DICTIONARY` to extend
+   *
+   * @default true
+   */
+  dictionary?: boolean | BanglishDictionary;
 }
+
+type BanglishDictionary = Readonly<Record<string, string>>;
 ```
 
 ---
@@ -205,30 +229,125 @@ const custom: PatternEntry[] = [
 
 ---
 
+## Smart-O & the Dictionary
+
+Banglish — Bengali typed in Latin letters — has one structural ambiguity that
+plain transliteration can't resolve: **the inherent অ**. Every Bangla
+consonant carries a silent /ɔ/ that is never written, but Banglish typists
+encode that sound with the letter `o`. The same `o` is also used for the
+explicit ো-kaar. So a strict phonetic engine cannot tell `mon` (মন, "mind",
+implicit অ) apart from `bon` (বোন, "sister", explicit ো-kaar) — both look
+like `Co<n>` in the input.
+
+This package solves the ambiguity with two cooperating layers:
+
+### 1. The smart-O engine rule
+
+Whenever `o` follows a consonant — anywhere in the word — the phonetic engine
+emits an internal Zero-Width Non-Joiner (`U+200C`) marker instead of ো-kaar.
+The marker is invisible, blocks the auto-hasanta logic from forming an
+unwanted conjunct between the surrounding consonants, and is stripped from
+the output before NFC normalisation.
+
+```ts
+toBangla('bosen');  // বসেন
+toBangla('mon');    // মন
+toBangla('kor');    // কর
+toBangla('hobe');   // হবে   (engine output now matches the canonical spelling)
+toBangla('bostro'); // বস্ত্র (the str cluster still works)
+```
+
+This is a deliberate deviation from strict Avro Phonetic. To get the original
+behaviour (`bo` → বো from the engine), pass `dictionary: false` *and* opt out
+of smart-O by overriding the `o` pattern — see *Custom Patterns* above.
+
+### 2. The word-level dictionary
+
+A bundled `BANGLISH_DICTIONARY` of ~250 high-frequency words is consulted
+**before** the engine runs and short-circuits known canonical spellings. It
+also restores the ো-kaar for words that legitimately have one:
+
+```ts
+toBangla('hobe');   // হবে    (dict: হবে — not the engine's হোবে)
+toBangla('to');     // তো    (dict overrides smart-O)
+toBangla('dekho');  // দেখো  (dict overrides smart-O — imperative)
+toBangla('sonar');  // সোনার  (dict — keeps the explicit ো-kaar)
+toBangla('baro');   // বারো  (dict — number 12)
+```
+
+#### Extending the dictionary
+
+Spread the default and add your own entries:
+
+```ts
+import { toBangla, BANGLISH_DICTIONARY } from '@subhesadek/avro-phonetic';
+
+toBangla('amar kompani', {
+  dictionary: { ...BANGLISH_DICTIONARY, kompani: 'কোম্পানি' },
+});
+// → আমার কোম্পানি
+```
+
+#### Replacing the dictionary
+
+Pass a plain object to use only your own mapping:
+
+```ts
+toBangla('greeting friend', {
+  dictionary: { greeting: 'হ্যালো', friend: 'বন্ধু' },
+});
+// → হ্যালো বন্ধু
+```
+
+#### Disabling the dictionary
+
+```ts
+toBangla('hobe', { dictionary: false }); // হবে (engine only, no dict)
+```
+
+Dictionary lookup is **case-insensitive**, keys are stored in lowercase, and
+the lookup uses `Object.hasOwn` so custom dictionaries can't be exploited via
+prototype pollution (`__proto__`, `constructor`, …).
+
+---
+
 ## Examples
 
 ```ts
 import { toBangla } from '@subhesadek/avro-phonetic';
 
 // Common greetings
-toBangla('assalamu alaikum');   // আস্সালামু আলাইকুম
-toBangla('namaskar');           // নমস্কার
+toBangla('namaskar');             // নমস্কার
+toBangla('assalamualaikum');      // আসসালামু আলাইকুম
 
 // Full sentences
-toBangla('amar naam Rahim.');   // আমার নাম রহিম।
-toBangla('tumi ki bhalo acho?');// তুমি কি ভালো আছো?
+toBangla('amar naam rohim.');     // আমার নাম রহিম।
+toBangla('tumi ki bhalo acho?');  // তুমি কি ভালো আছো?
+toBangla('ami bose achi.');       // আমি বসে আছি।
 
-// Numbers
-toBangla('ami 5 ta boi porechi'); // আমি ৫ তা বই পড়েছি
+// Smart-O — `o` after a consonant is the inherent অ
+toBangla('mon');                  // মন
+toBangla('bosen');                // বসেন
+toBangla('kor');                  // কর
+toBangla('bondhu');               // বন্ধু
+
+// Words with genuine ো-kaar live in the dictionary
+toBangla('sonar bangla');         // সোনার বাংলা
+toBangla('amar fon');             // আমার ফোন
+toBangla('baro');                 // বারো
+
+// Numbers (use `Ta` — capital T — for the টা counter)
+toBangla('ami 5 Ta boi porechi'); // আমি ৫ টা বই পড়েছি
 
 // Keep ASCII digits
 toBangla('chapter 3', { banglaDigits: false }); // চাপ্তের 3
 
 // Conjunct consonants
-toBangla('bidyalay');  // বিদ্যালয়
-toBangla('bangladesh');// বাংলাদেশ
-toBangla('prothom');   // প্রথম
-toBangla('biggyan');   // বিজ্ঞান
+toBangla('bangladesh');           // বাংলাদেশ
+toBangla('prothom');              // প্রথম
+toBangla('bostro');               // বস্ত্র
+toBangla('bijNGan');              // বিজ্ঞান   (use NG → জ্ঞ)
+toBangla('bidzaloy');             // বিদ্যালয় (use z → য)
 ```
 
 ---
