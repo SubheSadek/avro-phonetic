@@ -32,9 +32,10 @@ describe('Default Banglish dictionary', () => {
     expect(bn('dhonnobad')).toBe(nfc('ধন্যবাদ'));
   });
 
-  // Implicit-অ disambiguation: `o` between consonants is silent
-  it('jor → জর (implicit অ, not phonetic জোর)', () => {
-    expect(bn('jor')).toBe(nfc('জর'));
+  // `jor` is mapped to জ্বর (fever) for the clinical use case. The raw engine
+  // still produces জর (see avro.test.ts, dictionary disabled).
+  it('jor → জ্বর (clinical override for fever)', () => {
+    expect(bn('jor')).toBe(nfc('জ্বর'));
   });
 
   it('mon → মন (implicit অ)', () => {
@@ -211,5 +212,57 @@ describe('parse() returns english unchanged and bangla with dictionary applied',
     const r = parse('ami 5 ta', { banglaDigits: false });
     expect(r.bangla.normalize('NFC')).toContain('5');
     expect(r.bangla.normalize('NFC')).toContain(nfc('আমি'));
+  });
+});
+
+// ── Regression fixtures ──────────────────────────────────────────────────────
+// Table of real-world inputs that previously produced wrong output. Each entry
+// guards a specific fix so future changes to the engine or dictionary can't
+// silently regress them. Add a row here whenever a user reports a bad word.
+
+describe('Conversion regression fixtures', () => {
+  const cases: ReadonlyArray<[input: string, expected: string]> = [
+    // Engine bug fixes
+    ['Pakhi', 'পাখি'], // capitalised dictionary word (case-insensitive lookup)
+    ['Prothom', 'প্রথম'], // uppercase fallback — no raw Latin leak (was "Pাখি"-style)
+    ['chhobi', 'ছবি'], // lowercase chh → ছ (was চ্হবি)
+    // Inherent-অ between consonants (was এক্দিন এক্বার)
+    ['ekdin ekbar', 'একদিন একবার'],
+    // অ-initial words (engine would emit ও)
+    ['onek', 'অনেক'],
+    ['onno', 'অন্য'],
+    ['ortho', 'অর্থ'],
+    ['ekhono', 'এখনো'],
+    // Sibilant / retroflex disambiguation
+    ['thik', 'ঠিক'],
+    ['kichu', 'কিছু'],
+    ['shob', 'সব'],
+    ['sotti', 'সত্যি'],
+    ['jonogon', 'জনগণ'],
+    // ো-kaar / vowel-length words from the reported sample
+    ['bhorer', 'ভোরের'],
+    ['alo', 'আলো'],
+    ['prithibi', 'পৃথিবী'],
+    ['othe', 'ওঠে'],
+    ['dak', 'ডাক'],
+    ['shobuj', 'সবুজ'],
+    ['shomvob', 'সম্ভব'],
+    // A full phrase of dictionary words
+    ['bhorer alo onek shundor', 'ভোরের আলো অনেক সুন্দর'],
+    // Clinical vocabulary (dose / duration / instruction / comment)
+    ['tablet', 'ট্যাবলেট'],
+    ['capsule', 'ক্যাপসুল'],
+    ['oshudh', 'ওষুধ'],
+    ['khalipete', 'খালিপেটে'],
+    ['bishram', 'বিশ্রাম'],
+    ['proyojone', 'প্রয়োজনে'],
+    // Prescription-style phrases composed from dictionary words
+    ['khabarer por ekta tablet', 'খাবারের পর একটা ট্যাবলেট'],
+    ['din e tin bar', 'দিন এ তিন বার'],
+    ['khaben', 'খাবেন'],
+  ];
+
+  it.each(cases)('%s → %s', (input, expected) => {
+    expect(bn(input)).toBe(nfc(expected));
   });
 });

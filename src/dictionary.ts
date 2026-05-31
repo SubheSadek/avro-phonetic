@@ -36,7 +36,7 @@ import type { BanglishDictionary } from './types.js';
 /**
  * Default Banglish → Bangla word dictionary.
  *
- * Seed list of ~55 high-frequency words covering common pronouns, verb
+ * Several hundred high-frequency words covering common pronouns, verb
  * conjugations, and everyday vocabulary. Users can extend this via the
  * `dictionary` option on {@link parse}.
  *
@@ -64,7 +64,7 @@ import type { BanglishDictionary } from './types.js';
 //
 //   • `mon`  → মন      (implicit অ — "mind")
 //   • `bon`  → বোন    (explicit ো — "sister")
-//   • `jor`  → জর      (implicit অ — included here per project convention)
+//   • `ghor` → ঘর      (implicit অ — "room")
 //   • `bot`  → বট      (implicit অ — "banyan")
 //
 // So we list the canonical spelling for each high-frequency word and fall back
@@ -484,7 +484,9 @@ const DEFAULT_ENTRIES = {
   mati: 'মাটি',
   poth: 'পথ',
   por: 'পর',
-  jor: 'জর',
+  // `jor` maps to জ্বর (fever) for the clinical use case. Type `jore` for
+  // জোরে (loudly / forcefully) if you need the "force" sense.
+  jor: 'জ্বর',
   bol: 'বল',
   phol: 'ফল',
   jhol: 'ঝোল',
@@ -579,6 +581,287 @@ const DEFAULT_ENTRIES = {
   manush: 'মানুষ',
   bharat: 'ভারত',
   bangladesh: 'বাংলাদেশ',
+
+  // ── Nature / time-of-day (ো-kaar + vowel-length words the engine can't infer)
+  bhor: 'ভোর',
+  bhore: 'ভোরে',
+  bhorer: 'ভোরের',
+  shokalbela: 'সকালবেলা',
+  alo: 'আলো',
+  alor: 'আলোর',
+  aloy: 'আলোয়',
+  adhar: 'আঁধার',
+  prithibi: 'পৃথিবী',
+  prithibir: 'পৃথিবীর',
+  prokriti: 'প্রকৃতি',
+  shishir: 'শিশির',
+  bindu: 'বিন্দু',
+  pakhi: 'পাখি',
+  pakhir: 'পাখির',
+  shobuj: 'সবুজ', // casual `sh` spelling of সবুজ (canonical key is `sobuj`)
+  dak: 'ডাক',
+  daak: 'ডাক',
+
+  // ── Common verbs / forms the sample needed ─────────────────────────────────
+  othe: 'ওঠে', // জেগে ওঠে
+  uthe: 'উঠে',
+  uthi: 'উঠি',
+  jege: 'জেগে',
+  chheye: 'ছেয়ে',
+
+  // ── Everyday high-frequency words ──────────────────────────────────────────
+  kotha: 'কথা',
+  shuru: 'শুরু',
+  shesh: 'শেষ',
+  jibon: 'জীবন',
+  shomoy: 'সময়', // casual `sh` spelling of সময় (canonical key is `somoy`)
+  onnorokom: 'অন্যরকম',
+  shomvob: 'সম্ভব',
+  sombhob: 'সম্ভব',
+  oshomvob: 'অসম্ভব',
+  jobe: 'যবে',
+
+  // ── "ek-" compounds & similar inherent-অ words ─────────────────────────────
+  // The phonetic engine joins consecutive consonants into a conjunct (kd→ক্দ),
+  // so "ekdin" → এক্দিন. These common words carry a silent অ between the
+  // consonants (এক‑দিন) that only the dictionary can supply.
+  ekdin: 'একদিন',
+  ekbar: 'একবার',
+  ekjon: 'একজন',
+  ekta: 'একটা',
+  ekti: 'একটি',
+  ektu: 'একটু',
+  ekdom: 'একদম',
+  eksathe: 'একসাথে',
+  eksonge: 'একসঙ্গে',
+  ekebare: 'একেবারে',
+  protidin: 'প্রতিদিন',
+  protibar: 'প্রতিবার',
+  duijon: 'দুইজন',
+  tinjon: 'তিনজন',
+
+  // ── অ-initial words ────────────────────────────────────────────────────────
+  // A leading `o` always becomes the independent vowel ও in the engine, but
+  // these words start with the inherent অ sound, so the engine mis-spells them
+  // (e.g. "onek" → ওনেক instead of অনেক).
+  onek: 'অনেক',
+  onekta: 'অনেকটা',
+  onno: 'অন্য',
+  ortho: 'অর্থ',
+  olpo: 'অল্প',
+  ongsho: 'অংশ',
+  otit: 'অতীত',
+  odhik: 'অধিক',
+  odhikar: 'অধিকার',
+  obostha: 'অবস্থা',
+  oporadh: 'অপরাধ',
+  onurodh: 'অনুরোধ',
+  onumoti: 'অনুমতি',
+  onuvuti: 'অনুভূতি',
+  ovinoy: 'অভিনয়',
+  ovab: 'অভাব',
+  oshukh: 'অসুখ',
+
+  // ── Common sibilant / retroflex / inherent-অ words the engine can't infer ──
+  // `s`↔`sh` and `t`↔`Th` are ambiguous in casual Banglish, and silent অ
+  // between consonants is invisible — so these high-frequency words need
+  // canonical spellings. Both `s`/`sh` spellings are listed where people type
+  // either.
+  thik: 'ঠিক',
+  ekhono: 'এখনো',
+  kokhono: 'কখনো',
+  kichu: 'কিছু',
+  kichui: 'কিছুই',
+  shob: 'সব',
+  sob: 'সব',
+  shobai: 'সবাই',
+  shobkichu: 'সবকিছু',
+  sotti: 'সত্যি',
+  shotti: 'সত্যি',
+  mittha: 'মিথ্যা',
+  ichcha: 'ইচ্ছা',
+  chesta: 'চেষ্টা',
+  jinish: 'জিনিস',
+  bishoy: 'বিষয়',
+  shomossa: 'সমস্যা',
+  somossa: 'সমস্যা',
+  shorkar: 'সরকার',
+  sorkar: 'সরকার',
+  shadharon: 'সাধারণ',
+  shahajjo: 'সাহায্য',
+  sahajjo: 'সাহায্য',
+  shomporko: 'সম্পর্ক',
+  jonogon: 'জনগণ',
+
+  // ── Clinical: dose & form ──────────────────────────────────────────────────
+  // Most of these are loanwords the phonetic engine renders wrongly
+  // (e.g. "tablet" → তাবলেত), so they need canonical spellings.
+  tablet: 'ট্যাবলেট',
+  tab: 'ট্যাব',
+  capsule: 'ক্যাপসুল',
+  cap: 'ক্যাপ',
+  syrup: 'সিরাপ',
+  injection: 'ইনজেকশন',
+  inhaler: 'ইনহেলার',
+  drop: 'ড্রপ',
+  fota: 'ফোঁটা',
+  chamoch: 'চামচ',
+  matra: 'মাত্রা',
+  dose: 'ডোজ',
+  miligram: 'মিলিগ্রাম',
+  mili: 'মিলি',
+  unit: 'ইউনিট',
+  adha: 'আধা',
+  puro: 'পুরো',
+  gota: 'গোটা',
+  duto: 'দুটো',
+
+  // ── Clinical: duration & frequency ─────────────────────────────────────────
+  bar: 'বার',
+  din: 'দিন',
+  shoptaho: 'সপ্তাহ',
+  shoptahe: 'সপ্তাহে',
+  mash: 'মাস',
+  mashe: 'মাসে',
+  bochor: 'বছর',
+  ghonta: 'ঘণ্টা',
+  ghontay: 'ঘণ্টায়',
+  proti: 'প্রতি',
+  porpor: 'পরপর',
+  ektana: 'একটানা',
+  niyomito: 'নিয়মিত',
+
+  // ── Clinical: instructions (when/how to take) ──────────────────────────────
+  khabar: 'খাবার',
+  khabarer: 'খাবারের',
+  khaowar: 'খাওয়ার',
+  khali: 'খালি',
+  khalipete: 'খালিপেটে',
+  pete: 'পেটে',
+  bhora: 'ভরা',
+  khaben: 'খাবেন',
+  sheban: 'সেবন',
+  gile: 'গিলে',
+  chibiye: 'চিবিয়ে',
+  lagaben: 'লাগাবেন',
+  lagano: 'লাগানো',
+  byabohar: 'ব্যবহার',
+  ghum: 'ঘুম',
+  ghumanor: 'ঘুমানোর',
+  dupure: 'দুপুরে',
+  bikele: 'বিকেলে',
+  rate: 'রাতে',
+
+  // ── Clinical: comments & follow-up ─────────────────────────────────────────
+  bishram: 'বিশ্রাম',
+  followup: 'ফলোআপ',
+  porborti: 'পরবর্তী',
+  porbortite: 'পরবর্তীতে',
+  proyojon: 'প্রয়োজন',
+  proyojone: 'প্রয়োজনে',
+  dorkar: 'দরকার',
+  bondho: 'বন্ধ',
+  chaliye: 'চালিয়ে',
+  cholbe: 'চলবে',
+  report: 'রিপোর্ট',
+  test: 'টেস্ট',
+  porikkha: 'পরীক্ষা',
+  doctor: 'ডাক্তার',
+  daktar: 'ডাক্তার',
+  rogi: 'রোগী',
+  rog: 'রোগ',
+  oshudh: 'ওষুধ',
+  oushadh: 'ঔষধ',
+  hashpatal: 'হাসপাতাল',
+  chikitsa: 'চিকিৎসা',
+  shustho: 'সুস্থ',
+
+  // ── Clinical: common symptoms (referenced in comments) ─────────────────────
+  jwor: 'জ্বর',
+  byatha: 'ব্যথা',
+  kashi: 'কাশি',
+  shordi: 'সর্দি',
+  bomi: 'বমি',
+  mathabyatha: 'মাথাব্যথা',
+  durbol: 'দুর্বল',
+  durbolota: 'দুর্বলতা',
+  gas: 'গ্যাস',
+  allergy: 'অ্যালার্জি',
+
+  // ── Everyday: greetings, social & interjections ────────────────────────────
+  accha: 'আচ্ছা',
+  achcha: 'আচ্ছা',
+  are: 'আরে',
+  bah: 'বাহ',
+  ji: 'জি',
+  shuvo: 'শুভ',
+  shubho: 'শুভ',
+  obhinondon: 'অভিনন্দন',
+  dukkhito: 'দুঃখিত',
+  maf: 'মাফ',
+  doya: 'দয়া',
+
+  // ── Everyday: common verbs (base + frequent forms) ─────────────────────────
+  lekha: 'লেখা',
+  likhi: 'লিখি',
+  likhe: 'লিখে',
+  likhbo: 'লিখবো',
+  kena: 'কেনা',
+  kini: 'কিনি',
+  kine: 'কিনে',
+  kinbo: 'কিনবো',
+  bosha: 'বসা',
+  boshi: 'বসি',
+  bose: 'বসে',
+  boshbo: 'বসবো',
+  rakha: 'রাখা',
+  rakhi: 'রাখি',
+  rakhe: 'রাখে',
+  rakho: 'রাখো',
+  chola: 'চলা',
+  choli: 'চলি',
+  chole: 'চলে',
+  khola: 'খোলা',
+  ana: 'আনা',
+  ane: 'আনে',
+
+  // ── Everyday: common nouns & loanwords (engine mis-spells these) ───────────
+  taka: 'টাকা',
+  poysa: 'পয়সা',
+  dokan: 'দোকান',
+  bajar: 'বাজার',
+  school: 'স্কুল',
+  iskul: 'স্কুল',
+  office: 'অফিস',
+  college: 'কলেজ',
+  mobile: 'মোবাইল',
+  computer: 'কম্পিউটার',
+  internet: 'ইন্টারনেট',
+  shorir: 'শরীর',
+  kaj: 'কাজ',
+  khela: 'খেলা',
+  gan: 'গান',
+  golpo: 'গল্প',
+  khobor: 'খবর',
+  chithi: 'চিঠি',
+  chhuti: 'ছুটি',
+  jonmodin: 'জন্মদিন',
+  moja: 'মজা',
+
+  // ── Everyday: common adjectives & adverbs ──────────────────────────────────
+  khub: 'খুব',
+  beshi: 'বেশি',
+  kom: 'কম',
+  shudhu: 'শুধু',
+  matro: 'মাত্র',
+  abar: 'আবার',
+  aro: 'আরও',
+  prai: 'প্রায়',
+  pray: 'প্রায়',
+  joldi: 'জলদি',
+  taratari: 'তাড়াতাড়ি',
+  aste: 'আস্তে',
+  obosshoi: 'অবশ্যই',
 } satisfies Record<string, string>;
 
 export const BANGLISH_DICTIONARY: BanglishDictionary = Object.freeze(DEFAULT_ENTRIES);

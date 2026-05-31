@@ -139,6 +139,25 @@ function tryPattern(entry: PatternEntry, input: string, pos: number): string | n
   return replace;
 }
 
+/** A resolved pattern match: the matched `find` length plus its replacement. */
+interface Match {
+  readonly find: string;
+  readonly replace: string;
+}
+
+/**
+ * Returns the first {@link PatternEntry} that matches `segment` at `pos`
+ * (patterns are pre-sorted longest-first), resolved to its effective
+ * replacement, or `null` if nothing matches.
+ */
+function findMatch(segment: string, pos: number): Match | null {
+  for (const entry of SORTED_PATTERNS) {
+    const replace = tryPattern(entry, segment, pos);
+    if (replace !== null) return { find: entry.find, replace };
+  }
+  return null;
+}
+
 // ── Phonetic core ────────────────────────────────────────────────────────────
 
 /**
@@ -157,39 +176,48 @@ function phoneticParse(segment: string, banglaDigits: boolean): string {
   let pos = 0;
 
   while (pos < segment.length) {
-    let matched = false;
+    let match = findMatch(segment, pos);
 
-    for (const entry of SORTED_PATTERNS) {
-      const replacement = tryPattern(entry, segment, pos);
-
-      if (replacement !== null) {
-        // Resolve the effective replacement (respect banglaDigits option)
-        const effective =
-          !banglaDigits && /[০-৯]/u.test(replacement) ? (segment[pos] ?? '') : replacement;
-
-        // ── Auto-hasanta ────────────────────────────────────────────────────
-        // Real Avro Phonetic automatically forms a conjunct whenever two
-        // consecutive consonants appear without an intervening vowel.  Explicit
-        // cluster patterns (kr→ক্র, str→স্ত্র …) already embed hasanta in
-        // their replacement, so they are unaffected.  This logic only fires for
-        // combinations that are NOT covered by an explicit pattern — e.g.
-        // 'Tr' (ট+র), 'Dr' (ড+র), 'bkr' (ব+ক্র), etc.
-        if (endsInBanglaConsonant(bangla) && startsWithBanglaConsonant(effective)) {
-          bangla += BENGALI_HASANTA;
-        }
-
-        bangla += effective;
-        pos += entry.find.length;
-        matched = true;
-        break;
+    // ── Uppercase fallback ──────────────────────────────────────────────────
+    // An unmatched ASCII uppercase letter is almost always ordinary sentence
+    // or proper-noun capitalisation (e.g. "Pakhi"). Avro's *meaningful*
+    // capitals (T D N R S C O A E I U …) already match a pattern, so they
+    // never reach this branch. We retry the match once with this letter
+    // lower-cased so that raw Latin characters never leak into the Bangla
+    // output. The lower-cased copy is used only to resolve this single match;
+    // subsequent positions still see the original input.
+    if (match === null) {
+      const ch = segment[pos] ?? '';
+      if (ch >= 'A' && ch <= 'Z') {
+        const lowered = segment.slice(0, pos) + ch.toLowerCase() + segment.slice(pos + 1);
+        match = findMatch(lowered, pos);
       }
     }
 
-    if (!matched) {
+    if (match === null) {
       // Pass through any character that doesn't match a pattern
       bangla += segment[pos] ?? '';
       pos += 1;
+      continue;
     }
+
+    // Resolve the effective replacement (respect banglaDigits option)
+    const effective =
+      !banglaDigits && /[০-৯]/u.test(match.replace) ? (segment[pos] ?? '') : match.replace;
+
+    // ── Auto-hasanta ──────────────────────────────────────────────────────
+    // Real Avro Phonetic automatically forms a conjunct whenever two
+    // consecutive consonants appear without an intervening vowel.  Explicit
+    // cluster patterns (kr→ক্র, str→স্ত্র …) already embed hasanta in their
+    // replacement, so they are unaffected.  This logic only fires for
+    // combinations that are NOT covered by an explicit pattern — e.g.
+    // 'Tr' (ট+র), 'Dr' (ড+র), 'bkr' (ব+ক্র), etc.
+    if (endsInBanglaConsonant(bangla) && startsWithBanglaConsonant(effective)) {
+      bangla += BENGALI_HASANTA;
+    }
+
+    bangla += effective;
+    pos += match.find.length;
   }
 
   return bangla;

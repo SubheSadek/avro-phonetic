@@ -7,7 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.0.0] — 2026-05-29
+## [3.1.0] — 2026-05-31
+
+### Added
+
+- **Default dictionary expanded from ~250 to ~670 entries.** New coverage:
+  - **Clinical / prescription vocabulary** for dose, form, duration,
+    frequency, instructions, follow-up, and symptoms — e.g. `tablet` →
+    ট্যাবলেট, `capsule` → ক্যাপসুল, `oshudh` → ওষুধ, `khalipete` →
+    খালিপেটে, `bishram` → বিশ্রাম, `proyojone` → প্রয়োজনে, `khaben` →
+    খাবেন.
+  - **অ-initial words** the engine would otherwise start with ও — `onek` →
+    অনেক, `onno` → অন্য, `ortho` → অর্থ, `ekhono` → এখনো.
+  - **Sibilant / retroflex disambiguations** — `thik` → ঠিক, `kichu` →
+    কিছু, `shob` → সব, `sotti` → সত্যি, `jonogon` → জনগণ.
+  - **`ek-` compounds and counters** — `ekdin` → একদিন, `ekbar` → একবার,
+    `ekta` → একটা, `ektu` → একটু (the engine emits valid conjuncts like
+    এক্‌দিন; these entries restore the separate-syllable spelling).
+  - **Everyday vocabulary** — greetings, common verbs, loanwords, and
+    adverbs: `taka` → টাকা, `dokan` → দোকান, `school` / `iskul` → স্কুল,
+    `chithi` → চিঠি, `taratari` → তাড়াতাড়ি, `obosshoi` → অবশ্যই.
+- **Regression-fixture test table** in `tests/dictionary.test.ts` — a
+  table-driven `it.each` block that pins real-world inputs which previously
+  rendered wrong. Add a row whenever a user reports a bad word.
+
+### Fixed
+
+- **Uppercase Latin leak in the phonetic engine.** Words whose leading
+  capital is not a meaningful Avro capital used to leak the raw Latin letter
+  into the output (e.g. `Prothom` → `P্রথম`-style). The engine now falls
+  back to the lowercase pattern for non-significant capitals, so `Prothom` →
+  প্রথম and `Pakhi` → পাখি. Meaningful Avro capitals (T D N R S C O A E I U)
+  already match patterns and are unaffected.
+- **Missing `chh` → ছ mapping.** Lowercase `chh` now maps to ছ (tried before
+  `ch` → চ via longest-match), so `chhobi` → ছবি (was চ্হবি).
+
+### Changed
+
+- **`jor` now maps to জ্বর (fever)** instead of জর, for the clinical use
+  case. Type `jore` for জোরে ("loudly / forcefully"). The phonetic engine
+  (`dictionary: false`) still produces জর.
+
+---
+
+## [3.0.0] — 2026-05-29
 
 ### Breaking
 
@@ -101,6 +144,7 @@ dictionary entries. If your code relied on strict Avro Phonetic output
 
 ---
 
+[2.1.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v2.1.0
 [2.0.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v2.0.0
 [1.0.3]: https://github.com/subhesadek/avro-phonetic/releases/tag/v1.0.3
 [1.0.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v1.0.0

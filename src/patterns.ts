@@ -186,6 +186,10 @@ export const PATTERNS: readonly PatternEntry[] = [
   // Consonant clusters (3-char)
   { find: 'kSh', replace: B.KSH, rules: [] },
   { find: 'ksh', replace: B.KSH, rules: [] },
+  // `chh` is a very common casual spelling of ছ (the Avro key is `Ch`). As a
+  // 3-char pattern it is tried before the 2-char `ch`→চ, so `chhobi`→ছবি
+  // instead of চ্হবি.
+  { find: 'chh', replace: B.CHH, rules: [] },
   { find: 'GNG', replace: B.GNG, rules: [] },
   { find: 'jNG', replace: B.GNG, rules: [] },
   { find: 'bhl', replace: conj(B.BH, B.L), rules: [] },

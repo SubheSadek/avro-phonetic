@@ -2,7 +2,7 @@
 
 > Convert English transliteration to Bangla (Bengali) Unicode text using the Avro Phonetic keyboard layout.
 > Supports all vowels, consonants, conjuncts, special characters — and ships
-> with a built-in ~250-word dictionary plus a "smart-O" engine rule so common
+> with a built-in ~670-word dictionary plus a "smart-O" engine rule so common
 > Banglish words like `bosen` → বসেন, `mon` → মন, `kor` → কর just work.
 
 [![npm version](https://img.shields.io/npm/v/%40subhesadek%2Favro-phonetic?style=flat-square)](https://www.npmjs.com/package/@subhesadek/avro-phonetic)
@@ -17,7 +17,7 @@
 
 - **Full Avro Phonetic support** — all vowels, consonants, conjuncts, and special characters
 - **Smart-O for real-world Banglish** — `o` after a consonant is treated as the inherent অ that Bangla never writes (so `bosen` → বসেন, `kor` → কর, `hobe` → হবে) — see [Smart-O & the Dictionary](#smart-o--the-dictionary) below
-- **Built-in word dictionary** — ~250 canonical spellings for high-frequency words (pronouns, verb conjugations, family terms, numbers, …) with the ability to extend or replace
+- **Built-in word dictionary** — ~670 canonical spellings for high-frequency words (pronouns, verb conjugations, family terms, numbers, everyday vocabulary, and clinical/prescription terms) with the ability to extend or replace
 - **TypeScript-first** — written in TypeScript with strict types and bundled `.d.ts` declarations
 - **Dual package** — ships both ESM (`import`) and CommonJS (`require`) builds
 - **Zero dependencies** — tiny, self-contained, tree-shakeable
@@ -62,6 +62,47 @@ console.log(isBangla('ami'));  // false
 ```js
 const { toBangla } = require('@subhesadek/avro-phonetic');
 console.log(toBangla('ami'));
+```
+
+---
+
+## Examples
+
+```ts
+import { toBangla } from '@subhesadek/avro-phonetic';
+
+// Common greetings
+toBangla('namaskar');             // নমস্কার
+toBangla('assalamualaikum');      // আসসালামু আলাইকুম
+
+// Full sentences
+toBangla('amar naam rohim.');     // আমার নাম রহিম।
+toBangla('tumi ki bhalo acho?');  // তুমি কি ভালো আছো?
+toBangla('ami bose achi.');       // আমি বসে আছি।
+
+// Smart-O — `o` after a consonant is the inherent অ
+toBangla('mon');                  // মন
+toBangla('bosen');                // বসেন
+toBangla('kor');                  // কর
+toBangla('bondhu');               // বন্ধু
+
+// Words with genuine ো-kaar live in the dictionary
+toBangla('sonar bangla');         // সোনার বাংলা
+toBangla('amar fon');             // আমার ফোন
+toBangla('baro');                 // বারো
+
+// Numbers (use `Ta` — capital T — for the টা counter)
+toBangla('ami 5 Ta boi porechi'); // আমি ৫ টা বই পড়েছি
+
+// Keep ASCII digits
+toBangla('chapter 3', { banglaDigits: false }); // চাপ্তের 3
+
+// Conjunct consonants
+toBangla('bangladesh');           // বাংলাদেশ
+toBangla('prothom');              // প্রথম
+toBangla('bostro');               // বস্ত্র
+toBangla('bijNGan');              // বিজ্ঞান   (use NG → জ্ঞ)
+toBangla('bidzaloy');             // বিদ্যালয় (use z → য)
 ```
 
 ---
@@ -263,7 +304,7 @@ of smart-O by overriding the `o` pattern — see *Custom Patterns* above.
 
 ### 2. The word-level dictionary
 
-A bundled `BANGLISH_DICTIONARY` of ~250 high-frequency words is consulted
+A bundled `BANGLISH_DICTIONARY` of ~670 high-frequency words is consulted
 **before** the engine runs and short-circuits known canonical spellings. It
 also restores the ো-kaar for words that legitimately have one:
 
@@ -308,47 +349,6 @@ toBangla('hobe', { dictionary: false }); // হবে (engine only, no dict)
 Dictionary lookup is **case-insensitive**, keys are stored in lowercase, and
 the lookup uses `Object.hasOwn` so custom dictionaries can't be exploited via
 prototype pollution (`__proto__`, `constructor`, …).
-
----
-
-## Examples
-
-```ts
-import { toBangla } from '@subhesadek/avro-phonetic';
-
-// Common greetings
-toBangla('namaskar');             // নমস্কার
-toBangla('assalamualaikum');      // আসসালামু আলাইকুম
-
-// Full sentences
-toBangla('amar naam rohim.');     // আমার নাম রহিম।
-toBangla('tumi ki bhalo acho?');  // তুমি কি ভালো আছো?
-toBangla('ami bose achi.');       // আমি বসে আছি।
-
-// Smart-O — `o` after a consonant is the inherent অ
-toBangla('mon');                  // মন
-toBangla('bosen');                // বসেন
-toBangla('kor');                  // কর
-toBangla('bondhu');               // বন্ধু
-
-// Words with genuine ো-kaar live in the dictionary
-toBangla('sonar bangla');         // সোনার বাংলা
-toBangla('amar fon');             // আমার ফোন
-toBangla('baro');                 // বারো
-
-// Numbers (use `Ta` — capital T — for the টা counter)
-toBangla('ami 5 Ta boi porechi'); // আমি ৫ টা বই পড়েছি
-
-// Keep ASCII digits
-toBangla('chapter 3', { banglaDigits: false }); // চাপ্তের 3
-
-// Conjunct consonants
-toBangla('bangladesh');           // বাংলাদেশ
-toBangla('prothom');              // প্রথম
-toBangla('bostro');               // বস্ত্র
-toBangla('bijNGan');              // বিজ্ঞান   (use NG → জ্ঞ)
-toBangla('bidzaloy');             // বিদ্যালয় (use z → য)
-```
 
 ---
 
