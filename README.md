@@ -10,6 +10,9 @@
 [![Coverage](https://img.shields.io/codecov/c/github/subhesadek/avro-phonetic?style=flat-square)](https://codecov.io/gh/subhesadek/avro-phonetic)
 [![License](https://img.shields.io/npm/l/%40subhesadek%2Favro-phonetic?style=flat-square)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-7c6af7?style=flat-square)](https://avro-phonetic.vercel.app/)
+
+**▶ [Try the live playground](https://avro-phonetic.vercel.app/)** — type Banglish, see Bangla in real time.
 
 ---
 
