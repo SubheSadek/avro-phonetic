@@ -801,6 +801,16 @@ const DEFAULT_ENTRIES = {
   maf: 'মাফ',
   doya: 'দয়া',
 
+  // ── Festivals & occasions ──────────────────────────────────────────────────
+  // These carry the retroflex ষ (typed `Sh` in strict Avro) plus an implicit-অ,
+  // so the lowercase phonetic spelling people actually type ("borsho") would
+  // otherwise render as বর্স্হ. Canonical spellings live here instead.
+  noboborsho: 'নববর্ষ', // নববর্ষ — (Bengali) New Year, e.g. "shuvo noboborsho"
+  nobborsho: 'নববর্ষ', // common alternate spelling
+  borsho: 'বর্ষ', // বর্ষ — year / season
+  borso: 'বর্ষ', // common alternate spelling
+  borsha: 'বর্ষা', // বর্ষা — monsoon
+
   // ── Everyday: common verbs (base + frequent forms) ─────────────────────────
   lekha: 'লেখা',
   likhi: 'লিখি',

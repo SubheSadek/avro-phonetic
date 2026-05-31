@@ -4,7 +4,34 @@
 // step compiles the library and copies `dist/` next to this file, so there is
 // no third-party CDN dependency at runtime. To run locally, build the library
 // (`pnpm build`) and serve the folder over http (ESM cannot load over file://).
-import { toBangla } from './dist/index.js';
+//
+// A cache-busting query string (`?v=<timestamp>`) is appended so the browser
+// re-fetches the freshly built `dist/index.js` on every page load. Without it,
+// the ESM module cache can serve a stale build and hide local changes after a
+// rebuild — you'd have to hard-refresh. The dynamic import keeps the rest of
+// this module untouched.
+const { toBangla } = await import(`./dist/index.js?v=${Date.now()}`);
+
+// ── Build self-test ──────────────────────────────────────────────────────────
+// Confirms the browser actually loaded a *current* dist build. If this prints a
+// mismatch, the page is running a stale/old bundle (cache, un-rebuilt dist, or a
+// deployed site that hasn't been redeployed) — not a library bug. Open the
+// browser console to see the result.
+{
+  const probe = toBangla('shuvo noboborsho');
+  const expected = 'শুভ নববর্ষ'; // শুভ নববর্ষ
+  if (probe.normalize('NFC') === expected.normalize('NFC')) {
+    console.info('[playground] loaded build is CURRENT — "shuvo noboborsho" →', probe);
+  } else {
+    console.warn(
+      '[playground] STALE build loaded. Expected "%s" but got "%s". ' +
+        'Rebuild (pnpm build), restart the server, and hard-refresh; ' +
+        'if this is a deployed site, redeploy.',
+      expected,
+      probe,
+    );
+  }
+}
 
 const examples = [
   // Dictionary-backed canonical spellings
@@ -17,8 +44,7 @@ const examples = [
   'amar sonar bangla',
   'ami banglay gan gai',
   'khub bhalo',
-  'Dhaka Bangladesh',
-  'shuvo noboborsho',
+  'Dhaka Bangladesh'
 ];
 
 const inputEl = document.getElementById('input');

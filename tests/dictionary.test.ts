@@ -260,6 +260,10 @@ describe('Conversion regression fixtures', () => {
     ['khabarer por ekta tablet', 'খাবারের পর একটা ট্যাবলেট'],
     ['din e tin bar', 'দিন এ তিন বার'],
     ['khaben', 'খাবেন'],
+    // Festivals & occasions — retroflex ষ + implicit-অ (was বর্স্হ)
+    ['noboborsho', 'নববর্ষ'],
+    ['borsho', 'বর্ষ'],
+    ['shuvo noboborsho', 'শুভ নববর্ষ'],
   ];
 
   it.each(cases)('%s → %s', (input, expected) => {

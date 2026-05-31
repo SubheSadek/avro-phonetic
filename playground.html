@@ -217,7 +217,13 @@
     <div class="chips" id="chips"></div>
   </div>
 
-  <script type="module" src="./playground.js"></script>
+  <!-- Load the playground module with a cache-busting query so the browser
+       always fetches the latest local code (and, transitively, the freshly
+       built ./dist). Without this, a cached playground.js / dist/index.js can
+       hide local changes until a manual hard-refresh. -->
+  <script type="module">
+    import(`./playground.js?v=${Date.now()}`);
+  </script>
 
 </body>
 </html>
