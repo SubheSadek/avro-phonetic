@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.1] — 2026-06-01
+
+### Changed
+
+- **Playground script extracted to `playground.js`.** The inline `<script type="module">` block in `playground.html` is now a standalone file, making it easier to lint, test, and cache independently.
+- **Vercel deployment config added (`vercel.json`).** The playground can now be deployed to Vercel with a single push — the build step compiles the library, assembles `public/`, and serves it with strict CSP, `X-Content-Type-Options`, `X-Frame-Options`, and `Referrer-Policy` headers.
+
+---
+
 ## [2.1.0] — 2026-05-31
 
 ### Added
@@ -144,6 +153,7 @@ dictionary entries. If your code relied on strict Avro Phonetic output
 
 ---
 
+[2.1.1]: https://github.com/subhesadek/avro-phonetic/releases/tag/v2.1.1
 [2.1.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v2.1.0
 [2.0.0]: https://github.com/subhesadek/avro-phonetic/releases/tag/v2.0.0
 [1.0.3]: https://github.com/subhesadek/avro-phonetic/releases/tag/v1.0.3

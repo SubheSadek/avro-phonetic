@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Live playground for @subhesadek/avro-phonetic — convert English transliteration to Bangla (Bengali) Unicode in your browser." />
+  <title>avro-phonetic · live playground</title>
+  <!-- Lock down what the page is allowed to load. Scripts/styles inline + esm.sh module only. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self' 'unsafe-inline' https://esm.sh; style-src 'unsafe-inline'; connect-src https://esm.sh; img-src data:; base-uri 'none'; form-action 'none'" />
+  <style>
+    :root {
+      --bg: #0d1117; --panel: #161b22; --border: #30363d;
+      --text: #e6edf3; --muted: #8b949e; --accent: #2f81f7; --accent-2: #3fb950;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.5; padding: 2rem 1rem;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    h1 code { background: var(--panel); padding: .1em .35em; border-radius: 6px; font-size: .9em; }
+    .sub { color: var(--muted); margin: 0; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .4rem; font-size: .9rem; }
+    textarea {
+      width: 100%; min-height: 96px; resize: vertical; padding: .75rem;
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; font: inherit; font-size: 1rem;
+    }
+    textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+    .out {
+      min-height: 96px; padding: .75rem; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 1.5rem; white-space: pre-wrap; word-break: break-word;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: .75rem; }
+    .toggle { display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--muted); }
+    .toggle input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+    button {
+      margin-left: auto; padding: .5rem 1rem; background: var(--accent); color: #fff;
+      border: 0; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer;
+    }
+    button:hover { filter: brightness(1.1); }
+    .hint { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
+    .status { font-size: .85rem; color: var(--accent-2); min-height: 1.2em; }
+    .err { color: #f85149; }
+    footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 1.5rem; }
+    footer a { color: var(--accent); }
+    .install { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: .6rem .8rem; font-family: ui-monospace, monospace; font-size: .9rem; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><code>@subhesadek/avro-phonetic</code></h1>
+      <p class="sub">Type English (Banglish) → get Bangla. Try it before you install.</p>
+    </header>
+
+    <div class="panel">
+      <label for="input">English / Banglish input</label>
+      <textarea id="input" autofocus spellcheck="false" placeholder="ami banglay gan gai">ami banglay gan gai</textarea>
+      <div class="row">
+        <span class="toggle"><input type="checkbox" id="banglaDigits" checked /> <label for="banglaDigits" style="margin:0;font-weight:400">Bangla digits</label></span>
+        <span class="toggle"><input type="checkbox" id="banglaFullStop" checked /> <label for="banglaFullStop" style="margin:0;font-weight:400">Daari (।) for full stop</label></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <label>Bangla output <button id="copy" type="button">Copy</button></label>
+      <div id="output" class="out" lang="bn" dir="auto"></div>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div class="panel">
+      <label>Install</label>
+      <div class="install">npm install @subhesadek/avro-phonetic</div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/SubheSadek/avro-phonetic" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.npmjs.com/package/@subhesadek/avro-phonetic" target="_blank" rel="noopener">npm</a>
+    </footer>
+  </div>
+
+  <script type="module">
+    // Loads the REAL published package straight from the CDN — no build step.
+    // Pin the version so the demo matches a known release.
+    import { toBangla } from 'https://esm.sh/@subhesadek/avro-phonetic@2.1.0';
+
+    const $ = (id) => document.getElementById(id);
+    const input = $('input'), output = $('output'), status = $('status');
+    const digits = $('banglaDigits'), fullStop = $('banglaFullStop');
+
+    function render() {
+      try {
+        const result = toBangla(input.value, {
+          banglaDigits: digits.checked,
+          banglaFullStop: fullStop.checked,
+        });
+        // textContent (not innerHTML) — output is never interpreted as HTML.
+        output.textContent = result;
+        status.textContent = '';
+      } catch (e) {
+        status.textContent = 'Error: ' + (e?.message ?? String(e));
+        status.classList.add('err');
+      }
+    }
+
+    input.addEventListener('input', render);
+    digits.addEventListener('change', render);
+    fullStop.addEventListener('change', render);
+
+    $('copy').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(output.textContent);
+        status.classList.remove('err');
+        status.textContent = 'Copied!';
+        setTimeout(() => (status.textContent = ''), 1500);
+      } catch {
+        status.textContent = 'Copy failed — select and copy manually.';
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
